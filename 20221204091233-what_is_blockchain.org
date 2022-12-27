@@ -1,0 +1,206 @@
+:PROPERTIES:
+:ID:       2D3B2D68-ECEB-4169-B48A-26E30EE217F0
+:END:
+#+title: What is Blockchain?
+
+* State
++ State (trạng thái) - Là 1 cách để máy tính lưu trữ dữ liệu và thay đổi dữ liệu đó.
+#+begin_quote
+X=0 -> X=1
+#+end_quote
+
++ program state
++ Examples: Version Control
+  + Các Version là 1 state
+  + Các step Version chuyển đổi thì được gọi là transaction
+
+* Decentralized Environment
++ Là hệ thống phi tập trung!
++ Vậy câu hỏi đặt ra ở đây:
+  + Ai sẽ là người quyết định sự thay đổi của 1 state?
+  + Những người ra vào hệ thống sẽ làm gì?
+  + Khi có 2 người cùng đưa ra quyết định cùng 1 lúc thì làm gì?
+
+  [[./image/system-types.jpg]]
+
+* Decentralized Features
++ Level of Decentralization
+  + Các nhiệm vụ khác nhau của các =Participants=
+
++ Bảo Mật
+  + Single failure tolerance
+  + Availability
+  + => Problem Security
+
++ Hiệu xuất
+  + Sự đồng ý của toàn bộ các participants để đồng thuận.
+  + Vấn đề về truyển tải dữ liệu, thông điệp hoặc giao tiếp của các participants
+
+* Blockchain Concepts
++ A hệ thống chia sẽ dữ liệu trong một môi trường phi tập trung =decentralized=
++ Blockchain require
+  + =Immutability= - Tính Bất Biến
+  + =Transparency= - Tính Minh Bạch
+
+* State Machine
+[[./image/state-machine-2.png]]
+
+* What is Blockchain?
++ Danh sách liên kết của các block - một block sẽ chứa 1 lượng thông tin nhất định
++ Các thành viên trong hệ thông blockchain sẽ cùng nhau chia sẻ 1 lượng dữ liệu cùng nhau để tạo ra 1 loại dữ liệu duy nhất.
++ =các dữ liệu sẽ được công khai, và có tính chất append-only=
+
+* Blockchain Types
++ Permissionless Blockchain
+  + Any one can access freely
+  + Any one can read
+  + Examples: Bitcoin - Ethereum
+
++ Permissoned blockchain
+  + Participants need permisson for accessing
+  + Readers need permission
+  + Examples: HyperLedger Fabric, Corda
+
++ Consortium Blockchaim
+  + Participants needs permission for accessing
+  + Any one can read
+  + Examples: Ripple
+
+* Thành phần của 1 Blockchain
+
++ Consensus - Proof of Work / 1994 - Thresholded PoS
++ Network model
++ Data model
++ Cryptographic schemes
++ Decentralized Model
+
+* Consensus - Cơ chế đồng thuận
++ Nhiệm Vụ Chính
+  + Sắp xếp các transactions
+  + Đồng thuận cho 1 sự thay đổi mới.
+  + Xác thực các transactions.
+  + Làm thế nào để tránh được sự sai lệch, hiểu lầm giữa các thành viên trong hệ thống.
++ =2 đề xuất đầu tiên= xuất bản =1999=
+  + "[[https://www.geeksforgeeks.org/practical-byzantine-fault-tolerancepbft/][Practical Byzantine Fault Tolerance]]" solution for "[[https://vi.wikipedia.org/wiki/B%C3%A0i_to%C3%A1n_c%C3%A1c_v%E1%BB%8B_t%C6%B0%E1%BB%9Bng_Byzantine][Byzantine Generals]]' Problem" aka arbitrary failure
+  + "Proof of Work" - Mục đích tránh spam trong việc gửi Email.
++ Types
+  + =Permissionless= - Public Blockchain
+  + =Permissioned= - Private Blockchain
++ Properties
+  + Safety - Tránh được sự sung đột khi 2 hoặc nhiều block được xác thực tại cùng 1 thời điểm.
+  + Liveness - Tránh được việc sung đột giữa nhiều các participants không đồng thuận tại cùng 1 thời điểm.
++ Consensus Types
+  + Proof-of-X
+    + Permissionless blockchain
+    + Requires a proof to participant
+    + Example: Proof-of-Work, Stake, Authority, Space Time
+  + Practical Byzantine Fault Tolerance - =Schedule Solution=
+  + Federated Consensus (2014) - Stellar - Ripper
+
+* Blockchain Consensus Procedure
++ Leader finding - Làm sao để tìm ra người đề xuất cái block và đồng ý với cái block đó.
++ Propagation of block candidate (Broadcast) - Làm sao để đưa được cái block này đến với các thành viên khác.
++ Verification - Block Validation
++ Branch - Làm sao để lựa chọn các branch (Fork)
+  + Concepts
+    + =Longest=
+    + =Most focus=
++ Incentive - Khuyến khích trả thưởng.
+
+* =Practical Byzantine Fault Tolerance=
+[[./image/practical-byzantine-fault-tolerance.png]]
+
+* Federated Consensus
+[[./image/federated-consensus.png]]
+
+* Network Model
++ =Synchronous=
++ =Asynchronous=
++ =Partial Synchronous=
+[[https://decentralizedthoughts.github.io/2019-06-01-2019-5-31-models/][Synchronous, Asynchronous and Partial Synchronous]]
+
+* State Model | Delta Model
++ [[https://www.blockchain.com/][Blockchain Scan]]
++ Upspent transaction output (UTXO) and extension to eUTXO
+  + 1 Transaction sẽ có nhiều inputs và nhiều outputs
+  + Phù hợp với các ứng dụng không có nhiều sự tính toán phức tạp.
+
++ Account
+  + Lưu trữ dữ liệu vào tài khoản
+  + Phù hợp với ứng dụng có nhiều sự đa dạng trong tính toán.
+
++ Key-value
+
+* Cryptography Schemes
++ Hashing - Bảo vệ sự toàn diện của dữ liệu
++ Asymmetric key - Mã hoá signature
++ Merkle tree
++ Zero-knowledge proof
+  + zk-STARKs
+  + zk-SNARKs
+  + zk-EVM
+* Block, transaction's structure
+[[./image/bitcoin-blockchain-structure.png]]
+
+#+begin_src sh :exports no :results output
+echo "My Name i's Dang Quang Vu " | sha256sum
+#+end_src
+
+* Cryptocurrency
+** TimeLine
+[[./image/timeline.png]]
+
+* Blockchain Use Cases
+* Layer
+
+|-----------------------------------------------|
+| Layer-2: Application & Scalable Solution      |
+|-----------------------------------------------|
+| Layer-1: Virtual Machine - Contract execution |
+|-----------------------------------------------|
+| Layer-0: Accounting - Settlement              |
+|-----------------------------------------------|
+| HardWare                                      |
+|-----------------------------------------------|
+
+* Transportation
++ Mobility-as-a-Service
++ Decision-making ability in Autonomous Driving
+* Health
++ Monitoring Patients
++ Electronic Health Record
++ Drug traceability
+* E-government
++ E-Voting
++ Centralized bank digital currency
++ Identity
+
+* Security
++ Domain name system
++ Public key infrastructure
++ Log Event Storage
+
+* Mobile Network - 5G, 6G
++ Spectrum sharing
++ Edge Computing
+
+* Web3
++ KeyWords
+  + Decentralized Web
+  + Blockchain Technology
+  + Token usage
+  + Expection
+    + Security
+    + Scalability
+    + Privacy
+* Web3 Is
++ Decentralization / Federated Platform - Tính phi tập trung
++ Interoperatbility - Tính tương tác
++ Verifiable computing via blockchains
+
+* NFTs
++ non-Fungible Tokens (NFT) - A Financial security
++ Metaverse
+
+* Some Features Technology
++ Social Recovery Wallet
