@@ -1,0 +1,256 @@
+:PROPERTIES:
+:ID:       5FF40B0B-F867-4C83-B617-E826C1C8C453
+:END:
+#+title: VBI - Near Protocol 1 - Structure of a SmartContract
+
+#+NAME: contract-id
+#+begin_src
+dev-1672279110061-87269671860754
+#+end_src
+
+* Create contract NFT basic
+#+NAME: Contract.ts
+#+begin_src typescript
+import {
+  NearBindgen,
+  near,
+  call,
+  view,
+  LookupMap,
+  initialize,
+} from "near-sdk-js";
+
+@NearBindgen({})
+class VNFTContract {
+  owner_id: string;
+  owner_by_id: LookupMap;
+  constructor() {
+    this.owner_id = "";
+    this.owner_by_id = new LookupMap("o");
+  }
+
+  @initialize({})
+  init({ owner_id, owner_by_id_prefix }) {
+    this.owner_id = owner_id;
+    this.owner_by_id = new LookupMap(owner_by_id_prefix);
+  }
+}
+#+end_src
+
+#+begin_src sh :exports no :results output
+pnpm run deploy
+#+end_src
+
+#+NAME: Locally Login Wallet
+#+begin_src sh :exports no :results output
+near login
+#+end_src
+
+#+RESULTS:
+#+begin_example
+
+Please authorize NEAR CLI on at least one of your accounts.
+
+If your browser doesn't automatically open, please visit this URL
+https://wallet.testnet.near.org/login/?referrer=NEAR+CLI&public_key=ed25519%3A7pWvaPHyKxKXHn8jFwwCZo4w5eMfeJcoJjWc2q11rkHM&success_url=http%3A%2F%2F127.0.0.1%3A5001
+Please authorize at least one account at the URL above.
+
+Which account did you authorize for use with NEAR CLI?
+Enter it here (if not redirected automatically):
+Logged in as [ dangquangvurust.testnet ] with public key [ ed25519:7pWvaP... ] successfully
+
+#+end_example
+
+
+#+NAME: call init
+#+HEADER: :var Id="dev-1672279110061-87269671860754"
+#+begin_src sh :exports no :results output :var Id= :var Id=accountId
+near call dev-1672279110061-87269671860754 init '{"owner_id" : "dev-1672279110061-87269671860754", "owner_by_id_prefix": "vugomars"}' --accountId dev-1672279110061-87269671860754
+#+end_src
+
+#+RESULTS:
+: Scheduling a call: dev-1672279110061-87269671860754.init({"owner_id" : "dev-1672279110061-87269671860754", "owner_by_id_prefix": "vugomars"})
+: Doing account.functionCall()
+: Transaction Id G38sPKPrP83zHYEeBkhG7WcQpwgb2ExKgE7Mcr9gvd4q
+: To see the transaction in the transaction explorer, please open this url in your browser
+: https://explorer.testnet.near.org/transactions/G38sPKPrP83zHYEeBkhG7WcQpwgb2ExKgE7Mcr9gvd4q
+: ''
+
+#+NAME: call init again
+#+begin_example
+Scheduling a call: dev-1672279110061-87269671860754.init({"owner_id" : "dev-1672279110061-87269671860754", "owner_by_id_prefix": "vugomars"})
+Doing account.functionCall()
+Receipt: AMX77rWBhX2HbMEeL5RAoPsfwbMrzPSMyTgkvbrtE8gG
+ServerTransactionError: {"index":0,"kind":{"ExecutionError":"Smart contract panicked: Contract already initialized\n    at init (build/hello_near.js:497)\n"}}
+    at Object.parseResultError (/Users/vudangquang/.nvm/versions/node/v16.18.0/lib/node_modules/near-cli/node_modules/near-api-js/lib/utils/rpc_errors.js:31:29)
+    at Account.signAndSendTransactionV2 (/Users/vudangquang/.nvm/versions/node/v16.18.0/lib/node_modules/near-cli/node_modules/near-api-js/lib/account.js:160:36)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async scheduleFunctionCall (/Users/vudangquang/.nvm/versions/node/v16.18.0/lib/node_modules/near-cli/commands/call.js:57:38)
+    at async Object.handler (/Users/vudangquang/.nvm/versions/node/v16.18.0/lib/node_modules/near-cli/utils/exit-on-error.js:52:9) {
+  type: 'FunctionCallError',
+  context: undefined,
+  index: 0,
+  kind: {
+    ExecutionError: 'Smart contract panicked: Contract already initialized\n' +
+      '    at init (build/hello_near.js:497)\n'
+  },
+  transaction_outcome: {
+    block_hash: '3SQaUmL5ABsFAWHSQrAprbGJhGTCFUCtTR4oKJM1AbLj',
+    id: 'FrrBnXZfC4CrksLBwBL9X1a8cQBTsa3QLzmtdxGJTaG6',
+    outcome: {
+      executor_id: 'dev-1672279110061-87269671860754',
+      gas_burnt: 2428106582522,
+      logs: [],
+      metadata: [Object],
+      receipt_ids: [Array],
+      status: [Object],
+      tokens_burnt: '242810658252200000000'
+    },
+    proof: [ [Object], [Object], [Object] ]
+  }
+}
+#+end_example
+
+* Minting Functionality
+** Minting
+#+NAME: Defines Token
+#+begin_src typescript
+class Token {
+  token_id: any;
+  owner_id: AccountId;
+
+  constructor(token_id: any, owner_id: AccountId) {
+    this.token_id = token_id;
+    this.owner_id = owner_id;
+  }
+}
+#+end_src
+
+- Require:
+  + Sender = owner
+  + Token id must be unique
+#+NAME: minting token functionality - NFTContract
+#+begin_src typescript
+  @call({})
+  mint_nft({ token_id, token_owner_id }) {
+    assert(
+      near.predecessorAccountId() === this.owner_id,
+      "Unauthorized to mint"
+    );
+    assert(this.owner_by_id.get(token_id) === null, "Token ID Must e unique");
+    this.owner_by_id.set(token_id, token_owner_id);
+    return new Token(token_id, token_owner_id);
+  }
+#+end_src
+
+#+NAME: Miniting Call
+#+begin_src sh :exports no :results output var="dev-1672279110061-87269671860754"
+near call dev-1672279110061-87269671860754 mint_nft '{"token_id": "1", "token_owner_id": "dev-1672279110061-87269671860754"}' --accountId  dev-1672279110061-87269671860754
+#+end_src
+
+#+RESULTS:
+: Scheduling a call: dev-1672279110061-87269671860754.mint_nft({"token_id": "1", "token_owner_id": "dev-1672279110061-87269671860754"})
+: Doing account.functionCall()
+: Transaction Id Gbuyemz1jsZJjWXB6pkPdo4FVuE15SGQqWiiYXCacGs1
+: To see the transaction in the transaction explorer, please open this url in your browser
+: https://explorer.testnet.near.org/transactions/Gbuyemz1jsZJjWXB6pkPdo4FVuE15SGQqWiiYXCacGs1
+: { token_id: '1', owner_id: 'dev-1672279110061-87269671860754' }
+
+** View
+- Check owner by id is null
+#+begin_src typescript
+  @view({})
+  get_token_by_id({ token_id }) {
+    if (this.owner_by_id === null) {
+      return null;
+    }
+    let owner_of_token = this.owner_by_id.get(token_id);
+    return new Token(token_id, owner_of_token as AccountId);
+  }
+#+end_src
+
+#+begin_src sh :exports no :results output
+near view dev-1672279110061-87269671860754 get_token_by_id '{"token_id": "1"}'
+#+end_src
+
+#+RESULTS:
+: View call: dev-1672279110061-87269671860754.get_token_by_id({"token_id": "1"})
+: { token_id: '1', owner_id: 'dev-1672279110061-87269671860754' }
+
+* Connect Near with Frontend
+#+NAME: enviroment.js
+#+begin_src js
+function environment(env) {
+  if (env === "testnet") {
+    return {
+      networkId: "testnet",
+      nodeUrl: "https://rpc.testnet.near.org",
+      contractName: "course.dangquangvurust.testnet",
+      walletUrl: "https://wallet.testnet.near.org",
+      helperUrl: "https://helper.testnet.near.org",
+      explorerUrl: "https://explorer.testnet.near.org",
+    }
+  } else if (env === "mainnet") {
+    return {
+      networkId: "mainnet",
+      nodeUrl: "https://rpc.mainnet.near.org",
+      contractName: "course.dangquangvurust.mainnet",
+      walletUrl: "https://wallet.mainnet.near.org",
+      helperUrl: "https://helper.mainnet.near.org",
+      explorerUrl: "https://explorer.mainnet.near.org",
+    }
+  } else {
+    throw Error("Unknown enviroment ", env)
+  }
+}
+
+export default environment;
+#+end_src
+
+#+NAME: near.js
+#+begin_src js
+import {connect, Contract, keyStores, WalletConnection} from 'near-api-js'
+import environment from './config'
+
+const nearEnviroment = environment('testnet')
+
+export async function connectToContract() {
+  const near = await connect(
+    Object.assign({
+      deps: {
+        keyStore: new keyStores.BrowserLocalStorageKeyStore()
+      }
+    }, nearEnviroment)
+  )
+
+
+  window.walletConnection = new WalletConnection(near)
+
+  window.accountId = window.walletConnection.getAccountId();
+
+  window.contract = new Contract(
+    window.walletConnection.account(),
+    nearEnviroment.contractName,
+    {
+      viewMethods: ["get_token_by_id"],
+      changeMethods: ["mint_nft"]
+    }
+  )
+
+}
+
+export default connectToContract;
+#+end_src
+
+* Connect Wallet Handle
+#+NAME: near.js
+#+begin_src js
+export function signIn(){
+  window.walletConnection.requestSignIn(nearEnviroment.contractName);
+}
+
+export function signOut() {
+  window.walletConnection.SignOut()
+  window.location.reload();
+}
+#+end_src
